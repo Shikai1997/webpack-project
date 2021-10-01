@@ -13,7 +13,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "[name].js",
-        assetModuleFilename: "[path][name].[ext]",
+        assetModuleFilename: "[path][name][ext]",
+        clean: true
     },
     optimization: {
         splitChunks: {
@@ -28,27 +29,13 @@ module.exports = {
         },
     },
     module: {
-        rules: [
-            // {
-            //       test: /\.css$/i,
-            //       use: [MiniCssExtractPlugin.loader, "css-loader"],
-            //   },
-            {
+        rules: [{
                 test: /\.css$/i,
                 use: ["style-loader", "css-loader"],
             },
             {
                 test: /\.(sass|scss)$/i,
                 use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
-            },
-            {
-                // test: /\.html$/,
-                // use: [{
-                //     loader: "file-loader",
-                //     options: {
-                //         name: "[path][name].[ext]",
-                //     },
-                // }, ],
             },
             {
                 test: /\.(js)$/i,
