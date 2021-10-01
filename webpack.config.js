@@ -2,6 +2,7 @@ const path = require("path");
 // const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackPugPlugin = require("html-webpack-pug-plugin");
 
 module.exports = {
     mode: process.env.NODE_ENV,
@@ -80,6 +81,24 @@ module.exports = {
                     },
                 }, ],
             },
+            {
+                test: /\.pug$/,
+                use: [{
+                        loader: 'html-loader',
+                        options: {
+                            minimize: false
+                                // 不壓縮 HTML
+                        }
+                    },
+                    {
+                        loader: 'pug-html-loader',
+                        options: {
+                            pretty: true
+                                // 美化 HTML 的編排 (不壓縮HTML的一種)
+                        }
+                    },
+                ]
+            },
             // {
             //     test: /\.html$/i,
             //     loader: "html-loader",
@@ -97,6 +116,32 @@ module.exports = {
             filename: "index.html",
             template: "template/template.html",
             chunjs: ["vendor", "index"],
+        }),
+        new HtmlWebpackPlugin({
+            filename: "testpug.html",
+            template: "pug/index.pug",
+            chunjs: ["vendor", "index"],
+        }),
+        new HtmlWebpackPugPlugin({
+            template: path.join(__dirname, 'src/pug/index.pug'),
+            filename: 'test.html',
+            inject: true,
+            // 等於'body',javascript 資源將被放置到body元素的底部
+            chunks: ['device', 'main'],
+            // 指定需要引入的js，沒有設置默認全部引入
+            excludeChunks: ['devor.js'],
+            // 排除的js
+            minify: {
+                sortAttributes: true,
+                collapseWhitespace: false,
+                // 折疊空白字元就是壓縮Html
+                collapseBooleanAttributes: true,
+                // 折疊布林值属性，例:readonly checked
+                removeComments: true,
+                // 移除註釋
+                removeAttributeQuotes: true
+                    // 移除屬性的引號
+            }
         }),
     ],
     devServer: {
