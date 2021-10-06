@@ -2,7 +2,24 @@ const path = require("path");
 // const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const HtmlWebpackPugPlugin = require("html-webpack-pug-plugin");
+//  根據pug內路徑 生成對應htmlPlugins
+const setMPA = ()=>{
+	const glob = require('glob');
+	let htmlWebpackPlugins = [];
+	glob.sync('./src/pug/*.pug').forEach(src => {
+		const fullName = src.split('pug/')[1].split('.')[0]
+		htmlWebpackPlugins.push(
+			new HtmlWebpackPlugin({
+				filename: `${fullName}.html`,
+				template: path.join(__dirname, 'src/pug/'+fullName+'.pug'),
+				chunjs: ["vendor", "index"],
+			}),
+		)
+	});
+	return htmlWebpackPlugins
+}
+
+const htmlWebpackPlugins = setMPA();
 
 module.exports = {
     mode: process.env.NODE_ENV,
@@ -16,6 +33,7 @@ module.exports = {
         assetModuleFilename: "[path][name][ext]",
         clean: true
     },
+    target: ['web', 'es5'],
     optimization: {
         splitChunks: {
             cacheGroups: {
@@ -86,16 +104,9 @@ module.exports = {
                     },
                 ]
             },
-            // {
-            //     test: /\.html$/i,
-            //     loader: "html-loader",
-            // },
         ],
     },
     plugins: [
-        // new MiniCssExtractPlugin({
-        //     filename: "css/[name].css",
-        // }),
         //  直接搬
         new CopyWebpackPlugin({ patterns: [{ from: "assets", to: "assets" }] }),
         new HtmlWebpackPlugin({
@@ -104,33 +115,12 @@ module.exports = {
             template: "template/template.html",
             chunjs: ["vendor", "index"],
         }),
-        new HtmlWebpackPlugin({
-            filename: "testpug.html",
-            template: "pug/index.pug",
-            chunjs: ["vendor", "index"],
-        }),
-        new HtmlWebpackPugPlugin({
-            template: path.join(__dirname, 'src/pug/index.pug'),
-            filename: 'test.html',
-            inject: true,
-            // 等於'body',javascript 資源將被放置到body元素的底部
-            chunks: ['device', 'main'],
-            // 指定需要引入的js，沒有設置默認全部引入
-            excludeChunks: ['devor.js'],
-            // 排除的js
-            minify: {
-                sortAttributes: true,
-                collapseWhitespace: false,
-                // 折疊空白字元就是壓縮Html
-                collapseBooleanAttributes: true,
-                // 折疊布林值属性，例:readonly checked
-                removeComments: true,
-                // 移除註釋
-                removeAttributeQuotes: true
-                    // 移除屬性的引號
-            }
-        }),
-    ],
+        // new HtmlWebpackPlugin({
+        //     filename: "testpug.html",
+        //     template: "pug/index.pug",
+        //     chunjs: ["vendor", "index"],
+        // }),
+    ].concat(htmlWebpackPlugins),
     devServer: {
         compress: true,
         port: 3000,
