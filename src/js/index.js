@@ -5,7 +5,7 @@ import "../scss/index.scss";
 // import Add from "./tool.js";
 // import axios from 'axios';
 
-// const arr = [1, 2];
-// arr.forEach((item) => console.log(item));
+const arr = [1, 2];
+arr.forEach((item) => console.log(item));
 
 console.log('test');
